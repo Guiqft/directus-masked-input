@@ -1,11 +1,11 @@
 <template>
     <div class="masked-input">
         <v-input
+            id="inputEl"
             v-model="value"
             v-mask="hasMultipleMasks ? mask.split(', ') : mask"
             :disabled="disabled"
         />
-
         <p v-if="errorMessage">
             {{ errorMessage }}
         </p>
@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { ref, Directive, onMounted, inject, computed } from "vue"
+import { ref, Directive, onMounted, inject, computed, watch } from "vue"
 import { mask } from "vue-the-mask"
 import { isCnpj, isCpf } from "validator-brazil"
 
@@ -29,7 +29,7 @@ export default {
         maskType: { type: String, default: null },
     },
     setup(props, { emit }) {
-        const system = inject("system") as any
+        const stores = inject("stores") as Record<string, any>
         const mask = ref("")
         const hasMultipleMasks = ref(false)
         const errorMessage = ref("")
@@ -37,7 +37,11 @@ export default {
 
         const value = computed({
             get() {
-                return props.value || ""
+                return (
+                    props.value ||
+                    (document.getElementById("inputEl") as HTMLInputElement)
+                        .value
+                )
             },
             set(value: string) {
                 // here we put the handleInput() code
@@ -93,7 +97,7 @@ export default {
             // If aren't creating a new item
             if (props.primaryKey !== "+") {
                 // Get field edit config to disable the input
-                const currentField = system
+                const currentField = stores
                     .useFieldsStore()
                     .getField(props.collection, props.field)
                 disabled.value = currentField?.meta.readonly || disabled.value
@@ -103,10 +107,11 @@ export default {
             switch (props.maskType) {
                 case "cpf_cnpj":
                     mask.value = "###.###.###-##, ##.###.###/####-##"
-                    if (mask.value.includes(", ")) hasMultipleMasks.value = true
+                    hasMultipleMasks.value = true
                     break
                 case "telephone":
                     mask.value = "(##) ####-####, (##) #####-####"
+                    hasMultipleMasks.value = true
                     break
                 case "inscription_code":
                     mask.value = "#.#.#.####"

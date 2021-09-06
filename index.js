@@ -105,14 +105,16 @@ var script$1 = {
     },
     setup: function (props, _a) {
         var emit = _a.emit;
-        var system = inject("system");
+        var stores = inject("stores");
         var mask = ref("");
         var hasMultipleMasks = ref(false);
         var errorMessage = ref("");
         var disabled = ref(false);
         var value = computed({
             get: function () {
-                return props.value || "";
+                return (props.value ||
+                    document.getElementById("inputEl")
+                        .value);
             },
             set: function (value) {
                 switch (props.maskType) {
@@ -169,7 +171,7 @@ var script$1 = {
         });
         onMounted(function () {
             if (props.primaryKey !== "+") {
-                var currentField = system
+                var currentField = stores
                     .useFieldsStore()
                     .getField(props.collection, props.field);
                 disabled.value = (currentField === null || currentField === void 0 ? void 0 : currentField.meta.readonly) || disabled.value;
@@ -177,11 +179,11 @@ var script$1 = {
             switch (props.maskType) {
                 case "cpf_cnpj":
                     mask.value = "###.###.###-##, ##.###.###/####-##";
-                    if (mask.value.includes(", "))
-                        hasMultipleMasks.value = true;
+                    hasMultipleMasks.value = true;
                     break;
                 case "telephone":
                     mask.value = "(##) ####-####, (##) #####-####";
+                    hasMultipleMasks.value = true;
                     break;
                 case "inscription_code":
                     mask.value = "#.#.#.####";
@@ -220,6 +222,7 @@ const render$1 = /*#__PURE__*/_withId$1((_ctx, _cache, $props, $setup, $data, $o
 
   return (openBlock(), createBlock("div", _hoisted_1$1, [
     withDirectives(createVNode(_component_v_input, {
+      id: "inputEl",
       modelValue: $setup.value,
       "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($setup.value = $event)),
       disabled: $setup.disabled
