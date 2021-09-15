@@ -40,7 +40,7 @@ export default {
                 return (
                     props.value ||
                     (document.getElementById("inputEl") as HTMLInputElement)
-                        .value
+                        ?.value
                 )
             },
             set(value: string) {

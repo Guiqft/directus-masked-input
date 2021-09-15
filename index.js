@@ -112,9 +112,9 @@ var script$1 = {
         var disabled = ref(false);
         var value = computed({
             get: function () {
+                var _a;
                 return (props.value ||
-                    document.getElementById("inputEl")
-                        .value);
+                    ((_a = document.getElementById("inputEl")) === null || _a === void 0 ? void 0 : _a.value));
             },
             set: function (value) {
                 switch (props.maskType) {
