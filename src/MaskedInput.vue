@@ -46,8 +46,17 @@ export default {
             set(value: string) {
                 // here we put the handleInput() code
                 switch (props.maskType) {
-                    case "cpf_cnpj":
-                        if (!isCnpj(value || "") && !isCpf(value || "")) {
+                    case "cpf":
+                        if (!isCpf(value || "")) {
+                            errorMessage.value = "Insira um valor válido."
+                            emit("input", null)
+                        } else {
+                            emitInput(value)
+                        }
+                        break
+                    case "cnpj":
+                        console.log(value)
+                        if (!isCnpj(value || "")) {
                             errorMessage.value = "Insira um valor válido."
                             emit("input", null)
                         } else {
@@ -105,9 +114,11 @@ export default {
 
             // changing mask if given maskType
             switch (props.maskType) {
-                case "cpf_cnpj":
-                    mask.value = "###.###.###-##, ##.###.###/####-##"
-                    hasMultipleMasks.value = true
+                case "cpf":
+                    mask.value = "###.###.###-##"
+                    break
+                case "cnpj":
+                    mask.value = "##.###.###/####-##"
                     break
                 case "telephone":
                     mask.value = "(##) ####-####, (##) #####-####"

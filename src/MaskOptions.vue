@@ -30,7 +30,7 @@
 import { ref, PropType, onMounted } from "vue"
 
 interface MaskConfig {
-    maskType: "cpf_cnpj" | "inscription_code" | "telephone" | "custom"
+    maskType: "cpf" | "cnpj" | "inscription_code" | "telephone" | "custom"
     maskPattern: string
 }
 
@@ -88,7 +88,8 @@ export default {
                     options: {
                         placeholder: "Selecione uma máscara predefinida",
                         choices: [
-                            { text: "CPF/CNPJ", value: "cpf_cnpj" },
+                            { text: "CPF", value: "cpf" },
+                            { text: "CNPJ", value: "cnpj" },
                             {
                                 text: "Código de Inscrição",
                                 value: "inscription_code",

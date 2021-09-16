@@ -118,8 +118,18 @@ var script$1 = {
             },
             set: function (value) {
                 switch (props.maskType) {
-                    case "cpf_cnpj":
-                        if (!isCnpj(value || "") && !isCpf(value || "")) {
+                    case "cpf":
+                        if (!isCpf(value || "")) {
+                            errorMessage.value = "Insira um valor válido.";
+                            emit("input", null);
+                        }
+                        else {
+                            emitInput(value);
+                        }
+                        break;
+                    case "cnpj":
+                        console.log(value);
+                        if (!isCnpj(value || "")) {
                             errorMessage.value = "Insira um valor válido.";
                             emit("input", null);
                         }
@@ -177,9 +187,11 @@ var script$1 = {
                 disabled.value = (currentField === null || currentField === void 0 ? void 0 : currentField.meta.readonly) || disabled.value;
             }
             switch (props.maskType) {
-                case "cpf_cnpj":
-                    mask.value = "###.###.###-##, ##.###.###/####-##";
-                    hasMultipleMasks.value = true;
+                case "cpf":
+                    mask.value = "###.###.###-##";
+                    break;
+                case "cnpj":
+                    mask.value = "##.###.###/####-##";
                     break;
                 case "telephone":
                     mask.value = "(##) ####-####, (##) #####-####";
@@ -341,7 +353,8 @@ var script = {
                     options: {
                         placeholder: "Selecione uma máscara predefinida",
                         choices: [
-                            { text: "CPF/CNPJ", value: "cpf_cnpj" },
+                            { text: "CPF", value: "cpf" },
+                            { text: "CNPJ", value: "cnpj" },
                             {
                                 text: "Código de Inscrição",
                                 value: "inscription_code",
