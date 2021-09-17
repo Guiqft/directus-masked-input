@@ -1,7 +1,7 @@
 <template>
     <div class="masked-input">
         <v-input
-            id="inputEl"
+            :id="`inputEl-${uid}`"
             v-model="value"
             v-mask="hasMultipleMasks ? mask.split(', ') : mask"
             :disabled="disabled"
@@ -13,7 +13,14 @@
 </template>
 
 <script lang="ts">
-import { ref, Directive, onMounted, inject, computed, watch } from "vue"
+import {
+    ref,
+    Directive,
+    onMounted,
+    inject,
+    computed,
+    getCurrentInstance,
+} from "vue"
 import { mask } from "vue-the-mask"
 import { isCnpj, isCpf } from "validator-brazil"
 
@@ -29,6 +36,7 @@ export default {
         maskType: { type: String, default: null },
     },
     setup(props, { emit }) {
+        const { uid } = getCurrentInstance()
         const stores = inject("stores") as Record<string, any>
         const mask = ref("")
         const hasMultipleMasks = ref(false)
@@ -39,8 +47,11 @@ export default {
             get() {
                 return (
                     props.value ||
-                    (document.getElementById("inputEl") as HTMLInputElement)
-                        ?.value
+                    (
+                        document.getElementById(
+                            `inputEl-${uid}`
+                        ) as HTMLInputElement
+                    )?.value
                 )
             },
             set(value: string) {
@@ -141,6 +152,7 @@ export default {
         }
 
         return {
+            uid,
             value,
             mask,
             hasMultipleMasks,

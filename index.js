@@ -1,4 +1,4 @@
-import { inject, ref, computed, onMounted, pushScopeId, popScopeId, resolveComponent, resolveDirective, openBlock, createBlock, withDirectives, createVNode, toDisplayString, createCommentVNode, withScopeId, createTextVNode } from 'vue';
+import { getCurrentInstance, inject, ref, computed, onMounted, pushScopeId, popScopeId, resolveComponent, resolveDirective, openBlock, createBlock, withDirectives, createVNode, toDisplayString, createCommentVNode, withScopeId, createTextVNode } from 'vue';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -105,6 +105,7 @@ var script$1 = {
     },
     setup: function (props, _a) {
         var emit = _a.emit;
+        var uid = getCurrentInstance().uid;
         var stores = inject("stores");
         var mask = ref("");
         var hasMultipleMasks = ref(false);
@@ -114,7 +115,7 @@ var script$1 = {
             get: function () {
                 var _a;
                 return (props.value ||
-                    ((_a = document.getElementById("inputEl")) === null || _a === void 0 ? void 0 : _a.value));
+                    ((_a = document.getElementById("inputEl-" + uid)) === null || _a === void 0 ? void 0 : _a.value));
             },
             set: function (value) {
                 switch (props.maskType) {
@@ -212,6 +213,7 @@ var script$1 = {
             emit("input", value);
         };
         return {
+            uid: uid,
             value: value,
             mask: mask,
             hasMultipleMasks: hasMultipleMasks,
@@ -234,11 +236,11 @@ const render$1 = /*#__PURE__*/_withId$1((_ctx, _cache, $props, $setup, $data, $o
 
   return (openBlock(), createBlock("div", _hoisted_1$1, [
     withDirectives(createVNode(_component_v_input, {
-      id: "inputEl",
+      id: `inputEl-${$setup.uid}`,
       modelValue: $setup.value,
       "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($setup.value = $event)),
       disabled: $setup.disabled
-    }, null, 8 /* PROPS */, ["modelValue", "disabled"]), [
+    }, null, 8 /* PROPS */, ["id", "modelValue", "disabled"]), [
       [_directive_mask, $setup.hasMultipleMasks ? $setup.mask.split(', ') : $setup.mask]
     ]),
     ($setup.errorMessage)
