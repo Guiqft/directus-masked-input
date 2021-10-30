@@ -422,14 +422,17 @@ script.render = render;
 script.__scopeId = "data-v-aab0e4ae";
 script.__file = "src/MaskOptions.vue";
 
+var PreviewSVG = "<svg width=\"156\" height=\"96\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n\t<rect x=\"18\" y=\"35\" width=\"120\" height=\"26\" rx=\"6\" fill=\"var(--background-page)\" class=\"glow\" />\n\t<rect x=\"19\" y=\"36\" width=\"118\" height=\"24\" rx=\"5\" stroke=\"var(--primary)\" stroke-width=\"2\" />\n\t<rect x=\"28\" y=\"45\" width=\"50\" height=\"6\" rx=\"2\" fill=\"var(--primary)\" fill-opacity=\".25\" />\n\t<rect x=\"82\" y=\"45\" width=\"20\" height=\"6\" rx=\"2\" fill=\"var(--primary)\" fill-opacity=\".25\" />\n</svg>";
+
 var index = {
     id: "masked-input",
     name: "Entrada com Máscara",
     description: "Interface para um texto mascarado com predefinições para: CPNF/CNPJ, Código de Inscriçao e Telefone",
-    icon: "box",
     types: ["string"],
     component: script$1,
     options: script,
+    group: "standard",
+    preview: PreviewSVG,
 };
 
 export default index;
