@@ -1,25 +1,26 @@
 <template>
     <div class="mask-option">
         <v-form
+            :initialValues="initialValues"
             :fields="formFields"
             :model-value="value"
             @update:model-value="handleInput"
         />
 
-        <div class="mask-input" v-if="showMaskInput">
+        <div class="mask-input" v-if="showCustomMask">
             <div class="type-label">Mascara</div>
 
             <v-input
                 :model-value="value.maskPattern"
-                @update:model-value="setMask"
+                @update:model-value="setCustomMask"
                 placeholder="Insira a máscara do valor"
             />
             <p>
                 Múltiplas máscaras devem ser separadas por vírgula e espaço.
-                <br />Ex: (##) ####-####, (##) #####-#### <br />Mais informações
+                <br />Ex: (00) 0000-0000, (00) 00000-0000 <br />Mais informações
                 em:
-                <a href="https://vuejs-tips.github.io/vue-the-mask/"
-                    >vue-the-mask</a
+                <a href="https://imask.js.org/guide.html#masked-pattern"
+                    >iMask Pattern</a
                 >
             </p>
         </div>
@@ -43,40 +44,16 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const showMaskInput = ref(false)
+        const initialValues = ref({ maskType: null, maskPattern: null })
+        const showCustomMask = ref(false)
 
-        onMounted(() => {
-            if (props.value && props.value?.maskPattern)
-                showMaskInput.value = true
-        })
-
-        const handleInput = (editData: MaskConfig) => {
-            if (editData.maskType === "custom" && !props.value?.maskPattern) {
-                showMaskInput.value = true
-                emit("input", editData)
-            } else {
-                showMaskInput.value = false
-                delete props.value?.maskPattern
-                emit("input", {
-                    ...editData,
-                    maskPattern: null,
-                })
-            }
-        }
-
-        const setMask = (mask: string) => {
-            if (mask.length > 0) {
-                emit("input", {
-                    ...props.value,
-                    maskPattern: mask,
-                })
-            } else {
-                emit("input", {
-                    ...props.value,
-                    maskPattern: null,
-                })
-            }
-        }
+        const maskPatterns = {
+            cpf: "000.000.000-00",
+            cnpj: "00.000.000/0000-00",
+            inscription_code: "0.0.0.0000",
+            telephone: "(00) 00000-0000, (00) 0000-0000",
+            custom: undefined,
+        } as Record<MaskConfig["maskType"], string | undefined>
 
         const formFields = [
             {
@@ -86,7 +63,9 @@ export default {
                 meta: {
                     interface: "select-dropdown",
                     options: {
-                        placeholder: "Selecione uma máscara predefinida",
+                        placeholder: showCustomMask.value
+                            ? "Insira o padrão da máscara customizada"
+                            : "Selecione uma máscara predefinida",
                         choices: [
                             { text: "CPF", value: "cpf" },
                             { text: "CNPJ", value: "cnpj" },
@@ -98,11 +77,67 @@ export default {
                             { text: "Customizada...", value: "custom" },
                         ],
                     },
+                    required: true,
                 },
             },
         ]
 
-        return { showMaskInput, handleInput, setMask, formFields }
+        onMounted(() => {
+            if (props.value?.maskType === "custom") showCustomMask.value = true
+
+            if (props.value.maskPattern) {
+                initialValues.value = props.value
+            }
+        })
+
+        const handleInput = (editData: MaskConfig) => {
+            if (editData.maskType === "custom") {
+                showCustomMask.value = true
+                emitMask({
+                    maskType: "custom",
+                    maskPattern: null,
+                })
+            } else {
+                showCustomMask.value = false
+                emitMask(editData)
+            }
+        }
+
+        const emitMask = (mask: MaskConfig) => {
+            if (mask.maskType === "custom") {
+                if (mask.maskPattern) {
+                    emit("input", {
+                        maskType: mask.maskType,
+                        maskPattern: mask.maskPattern,
+                    })
+                } else {
+                    emit("input", {
+                        maskType: null,
+                        maskPattern: null,
+                    })
+                }
+            } else {
+                emit("input", {
+                    maskType: mask.maskType,
+                    maskPattern: maskPatterns[mask.maskType],
+                })
+            }
+        }
+
+        const setCustomMask = (mask: string) => {
+            emitMask({
+                maskType: "custom",
+                maskPattern: mask,
+            })
+        }
+
+        return {
+            initialValues,
+            showCustomMask,
+            handleInput,
+            setCustomMask,
+            formFields,
+        }
     },
 }
 </script>
