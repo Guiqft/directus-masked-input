@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { ref, PropType, onMounted } from "vue"
+import { ref, PropType, onMounted, inject } from "vue"
 
 interface MaskConfig {
     maskType: "cpf" | "cnpj" | "inscription_code" | "telephone" | "custom"
@@ -42,10 +42,19 @@ export default {
             type: Object as PropType<MaskConfig>,
             default: { maskType: null, maskPattern: null },
         },
+        collection: {
+            type: String,
+            default: null,
+        },
+        field: {
+            type: String,
+            default: null,
+        },
     },
     setup(props, { emit }) {
         const initialValues = ref({ maskType: null, maskPattern: null })
         const showCustomMask = ref(false)
+        const { useFieldsStore } = inject("stores")
 
         const maskPatterns = {
             cpf: "000.000.000-00",
@@ -90,20 +99,29 @@ export default {
             }
         })
 
-        const handleInput = (editData: MaskConfig) => {
+        const handleInput = async (editData: MaskConfig) => {
             if (editData.maskType === "custom") {
                 showCustomMask.value = true
-                emitMask({
+                await emitMask({
                     maskType: "custom",
                     maskPattern: null,
                 })
             } else {
                 showCustomMask.value = false
-                emitMask(editData)
+                await emitMask(editData)
             }
         }
 
-        const emitMask = (mask: MaskConfig) => {
+        const emitMask = async (mask: MaskConfig) => {
+            await useFieldsStore().updateField(props.collection, props.field, {
+                meta: {
+                    options: {
+                        maskType: mask.maskType,
+                        maskPattern: mask.maskPattern,
+                    },
+                },
+            })
+
             if (mask.maskType === "custom") {
                 if (mask.maskPattern) {
                     emit("input", {
