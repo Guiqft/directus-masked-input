@@ -1,11 +1,6 @@
 <template>
     <div class="masked-input">
-        <v-input
-            :model-value="value"
-            @input="handleInput"
-            :disabled="disabled"
-        />
-
+        <v-input ref="input" @input="handleInput" :disabled="disabled" />
         <p v-if="errorMessage">
             {{ errorMessage }}
         </p>
@@ -82,6 +77,17 @@ const currencyFormatter = (
     return `${sign}${currencyPrefix ? "R$ " : ""}${number(Math.abs(value))}`
 }
 
+const useInputInitialValue = (value: string) => {
+    const input = ref<HTMLInputElement>()
+    onMounted(() => {
+        // @ts-expect-error property $el is not defined on types
+        const inputEl = input.value?.$el.querySelector("input")
+        inputEl.value = value
+    })
+
+    return input
+}
+
 export default {
     emits: ["input"],
     props: {
@@ -94,6 +100,7 @@ export default {
         validate: { type: Boolean, default: true },
     },
     setup(props, { emit }) {
+        const input = useInputInitialValue(props.value)
         const errorMessage = ref<string>()
         const maskPattern = ref<AnyMaskedOptions>(
             {
@@ -184,8 +191,7 @@ export default {
                 case "currency":
                     return
                 case "custom":
-
-                // if(mask.compiledMasks[0].mask.toString().length)
+                // if (mask.compiledMasks[0].mask.toString().length)
                 //     if (hasMultipleMasks.value) {
                 //         const masks = maskPattern.value.split(", ")
                 //         const lengths = masks.map((el) => el.length)
@@ -197,18 +203,20 @@ export default {
                 //     } else {
                 //         if (
                 //             !valueToValidate ||
-                //             valueToValidate.length < maskPattern.value.length
+                //             valueToValidate.length <
+                //                 maskPattern.value.length
                 //         ) {
                 //             errorMessage.value = "Insira um código válido."
                 //             return false
                 //         }
                 //     }
 
-                //     return true
+                // return true
             }
         }
 
         return {
+            input,
             disabled,
             handleInput,
             errorMessage,
