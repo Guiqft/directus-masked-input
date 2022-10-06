@@ -32,8 +32,6 @@ const useInterfaceDisabled = (
         if (pk !== "+") {
             // Get field edit config to disable the input
             disabled.value = Boolean(field.meta?.readonly)
-        } else {
-            disabled.value = Boolean(!field.meta?.required)
         }
     })
     return disabled
